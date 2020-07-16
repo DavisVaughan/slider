@@ -67,20 +67,18 @@ SEXP slide_common_impl(SEXP x,
                        SEXP ptype,
                        SEXP env,
                        SEXP params) {
-
   const int type = pull_type(params);
   const int force = compute_force(type);
   const int size = compute_size(x, type);
 
+  const bool constrain = pull_constrain(params);
+  const bool atomic = pull_atomic(params);
+
   bool before_unbounded = false;
   bool after_unbounded = false;
 
-  const bool constrain = pull_constrain(params);
-  const bool atomic = pull_atomic(params);
   const int before = pull_before(params, &before_unbounded);
   const int after = pull_after(params, &after_unbounded);
-  const int step = pull_step(params);
-  const bool complete = pull_complete(params);
 
   const bool before_positive = before >= 0;
   const bool after_positive = after >= 0;
@@ -89,23 +87,30 @@ SEXP slide_common_impl(SEXP x,
   check_before_negativeness(before, after, before_positive, after_unbounded);
   check_after_negativeness(after, before, after_positive, before_unbounded);
 
+  const int step = pull_step(params);
+  const bool complete = pull_complete(params);
+
+  bool has_min_before = false;
+  bool has_min_after = false;
+
+  const int min_before = pull_min_before(params, complete, before, before_positive, &has_min_before);
+  const int min_after = pull_min_after(params, complete, after, after_positive, &has_min_after);
+
   int iteration_min = 0;
   int iteration_max = size;
 
   // Iteration adjustment
-  if (complete) {
-    if (before_positive) {
-      iteration_min += before;
-    }
-    if (after_positive) {
-      iteration_max -= after;
-    }
+  if (has_min_before) {
+    iteration_min += min_before;
+  }
+  if (has_min_after) {
+    iteration_max -= min_after;
   }
 
   // Forward adjustment to match the number of iterations
   int offset = 0;
-  if (complete && before_positive) {
-    offset = before;
+  if (has_min_before) {
+    offset = min_before;
   }
 
   int start;

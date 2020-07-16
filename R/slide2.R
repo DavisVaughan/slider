@@ -82,7 +82,9 @@ slide2 <- function(.x,
                    .before = 0L,
                    .after = 0L,
                    .step = 1L,
-                   .complete = FALSE) {
+                   .complete = FALSE,
+                   .min_before = NULL,
+                   .min_after = NULL) {
   slide2_impl(
     .x,
     .y,
@@ -92,6 +94,8 @@ slide2 <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = list(),
     .constrain = FALSE,
     .atomic = FALSE
@@ -108,6 +112,8 @@ slide2_vec <- function(.x,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .ptype = NULL) {
   out <- slide2_impl(
     .x,
@@ -118,6 +124,8 @@ slide2_vec <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = list(),
     .constrain = FALSE,
     .atomic = TRUE
@@ -134,6 +142,8 @@ slide2_vec_direct <- function(.x,
                               .after,
                               .step,
                               .complete,
+                              .min_before,
+                              .min_after,
                               .ptype) {
   slide2_impl(
     .x,
@@ -144,6 +154,8 @@ slide2_vec_direct <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = .ptype,
     .constrain = TRUE,
     .atomic = TRUE
@@ -159,7 +171,9 @@ slide2_dbl <- function(.x,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   slide2_vec_direct(
     .x,
     .y,
@@ -169,6 +183,8 @@ slide2_dbl <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = double()
   )
 }
@@ -182,7 +198,9 @@ slide2_int <- function(.x,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   slide2_vec_direct(
     .x,
     .y,
@@ -192,6 +210,8 @@ slide2_int <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = integer()
   )
 }
@@ -205,7 +225,9 @@ slide2_lgl <- function(.x,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   slide2_vec_direct(
     .x,
     .y,
@@ -215,6 +237,8 @@ slide2_lgl <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = logical()
   )
 }
@@ -228,7 +252,9 @@ slide2_chr <- function(.x,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   slide2_vec_direct(
     .x,
     .y,
@@ -238,6 +264,8 @@ slide2_chr <- function(.x,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = character()
   )
 }
@@ -253,6 +281,8 @@ slide2_dfr <- function(.x,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .names_to = rlang::zap(),
                        .name_repair = c("unique", "universal", "check_unique")) {
   out <- slide2(
@@ -263,7 +293,9 @@ slide2_dfr <- function(.x,
     .before = .before,
     .after = .after,
     .step = .step,
-    .complete = .complete
+    .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after
   )
 
   vec_rbind(!!!out, .names_to = .names_to, .name_repair = .name_repair)
@@ -280,6 +312,8 @@ slide2_dfc <- function(.x,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .size = NULL,
                        .name_repair = c("unique", "universal", "check_unique", "minimal")) {
   out <- slide2(
@@ -290,7 +324,9 @@ slide2_dfc <- function(.x,
     .before = .before,
     .after = .after,
     .step = .step,
-    .complete = .complete
+    .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after
   )
 
   vec_cbind(!!!out, .size = .size, .name_repair = .name_repair)
@@ -306,6 +342,8 @@ slide2_impl <- function(.x,
                         .after,
                         .step,
                         .complete,
+                        .min_before,
+                        .min_after,
                         .ptype,
                         .constrain,
                         .atomic) {
@@ -330,7 +368,9 @@ slide2_impl <- function(.x,
     .before,
     .after,
     .step,
-    .complete
+    .complete,
+    .min_before,
+    .min_after
   )
 
   slide_common(

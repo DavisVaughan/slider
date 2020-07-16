@@ -47,6 +47,8 @@ extern SEXP strings_dot_before;
 extern SEXP strings_dot_after;
 extern SEXP strings_dot_step;
 extern SEXP strings_dot_complete;
+extern SEXP strings_dot_min_before;
+extern SEXP strings_dot_min_after;
 
 extern SEXP syms_dot_x;
 extern SEXP syms_dot_y;

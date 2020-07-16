@@ -7,7 +7,9 @@ pslide <- function(.l,
                    .before = 0L,
                    .after = 0L,
                    .step = 1L,
-                   .complete = FALSE) {
+                   .complete = FALSE,
+                   .min_before = NULL,
+                   .min_after = NULL) {
   pslide_impl(
     .l,
     .f,
@@ -16,6 +18,8 @@ pslide <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = list(),
     .constrain = FALSE,
     .atomic = FALSE
@@ -31,6 +35,8 @@ pslide_vec <- function(.l,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .ptype = NULL) {
   out <- pslide_impl(
     .l,
@@ -40,6 +46,8 @@ pslide_vec <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = list(),
     .constrain = FALSE,
     .atomic = TRUE
@@ -55,6 +63,8 @@ pslide_vec_direct <- function(.l,
                               .after,
                               .step,
                               .complete,
+                              .min_before,
+                              .min_after,
                               .ptype) {
   pslide_impl(
     .l,
@@ -64,6 +74,8 @@ pslide_vec_direct <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = .ptype,
     .constrain = TRUE,
     .atomic = TRUE
@@ -78,7 +90,9 @@ pslide_dbl <- function(.l,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   pslide_vec_direct(
     .l,
     .f,
@@ -87,6 +101,8 @@ pslide_dbl <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = double()
   )
 }
@@ -99,7 +115,9 @@ pslide_int <- function(.l,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   pslide_vec_direct(
     .l,
     .f,
@@ -108,6 +126,8 @@ pslide_int <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = integer()
   )
 }
@@ -120,7 +140,9 @@ pslide_lgl <- function(.l,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   pslide_vec_direct(
     .l,
     .f,
@@ -129,6 +151,8 @@ pslide_lgl <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = logical()
   )
 }
@@ -141,7 +165,9 @@ pslide_chr <- function(.l,
                        .before = 0L,
                        .after = 0L,
                        .step = 1L,
-                       .complete = FALSE) {
+                       .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL) {
   pslide_vec_direct(
     .l,
     .f,
@@ -150,6 +176,8 @@ pslide_chr <- function(.l,
     .after = .after,
     .step = .step,
     .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after,
     .ptype = character()
   )
 }
@@ -164,6 +192,8 @@ pslide_dfr <- function(.l,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .names_to = rlang::zap(),
                        .name_repair = c("unique", "universal", "check_unique")) {
   out <- pslide(
@@ -173,7 +203,9 @@ pslide_dfr <- function(.l,
     .before = .before,
     .after = .after,
     .step = .step,
-    .complete = .complete
+    .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after
   )
 
   vec_rbind(!!!out, .names_to = .names_to, .name_repair = .name_repair)
@@ -189,6 +221,8 @@ pslide_dfc <- function(.l,
                        .after = 0L,
                        .step = 1L,
                        .complete = FALSE,
+                       .min_before = NULL,
+                       .min_after = NULL,
                        .size = NULL,
                        .name_repair = c("unique", "universal", "check_unique", "minimal")) {
   out <- pslide(
@@ -198,7 +232,9 @@ pslide_dfc <- function(.l,
     .before = .before,
     .after = .after,
     .step = .step,
-    .complete = .complete
+    .complete = .complete,
+    .min_before = .min_before,
+    .min_after = .min_after
   )
 
   vec_cbind(!!!out, .size = .size, .name_repair = .name_repair)
@@ -213,6 +249,8 @@ pslide_impl <- function(.l,
                         .after,
                         .step,
                         .complete,
+                        .min_before,
+                        .min_after,
                         .ptype,
                         .constrain,
                         .atomic) {
@@ -249,7 +287,9 @@ pslide_impl <- function(.l,
     .before,
     .after,
     .step,
-    .complete
+    .complete,
+    .min_before,
+    .min_after
   )
 
   slide_common(

@@ -122,6 +122,84 @@ int pull_complete(SEXP params) {
   return r_scalar_lgl_get(complete);
 }
 
+// [[ include("params.h") ]]
+int pull_min_before(SEXP params, bool complete, int before, bool before_positive, bool* p_has_min_before) {
+  SEXP min_before = r_lst_get(params, 7);
+
+  // With no user provided `min_before`,
+  // we only need to adjust if `complete` is set instead
+  if (min_before == R_NilValue) {
+    if (complete) {
+      *p_has_min_before = true;
+    }
+    if (before_positive) {
+      return before;
+    } else {
+      return 0;
+    }
+  }
+
+  *p_has_min_before = true;
+
+  min_before = PROTECT(check_scalar_int(min_before, strings_dot_min_before));
+
+  int out = r_scalar_int_get(min_before);
+
+  if (out == NA_INTEGER) {
+    Rf_errorcall(R_NilValue, "`.min_before` must not be missing.");
+  }
+
+  if (out < 0) {
+    Rf_errorcall(
+      R_NilValue,
+      "`.min_before` (%i) must be a positive value, or zero.",
+      out
+    );
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+// [[ include("params.h") ]]
+int pull_min_after(SEXP params, bool complete, int after, bool after_positive, bool* p_has_min_after) {
+  SEXP min_after = r_lst_get(params, 8);
+
+  // With no user provided `min_after`,
+  // we only need to adjust if `complete` is set instead
+  if (min_after == R_NilValue) {
+    if (complete) {
+      *p_has_min_after = true;
+    }
+    if (after_positive) {
+      return after;
+    } else {
+      return 0;
+    }
+  }
+
+  *p_has_min_after = true;
+
+  min_after = PROTECT(check_scalar_int(min_after, strings_dot_min_after));
+
+  int out = r_scalar_int_get(min_after);
+
+  if (out == NA_INTEGER) {
+    Rf_errorcall(R_NilValue, "`.min_after` must not be missing.");
+  }
+
+  if (out < 0) {
+    Rf_errorcall(
+      R_NilValue,
+      "`.min_after` (%i) must be a positive value, or zero.",
+      out
+    );
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
 // -----------------------------------------------------------------------------
 
 // [[ include("params.h") ]]
